@@ -36,27 +36,7 @@
 #include "WProgram.h"
 #endif
 
-// If you want to use SerialCommand with the hardware serial port only, and want to disable
-// SoftwareSerial support, and thus don't have to use "#include <SoftwareSerial.h>" in your
-// sketches, then uncomment this define for SERIALCOMMAND_HARDWAREONLY, and comment out the
-// corresponding #undef line.
-//
-// You don't have to use SoftwareSerial features if this is not defined, you can still only use
-// the Hardware serial port, just that this way lets you get out of having to include
-// the SoftwareSerial.h header.
-//#define SERIALCOMMAND_HARDWAREONLY 1
-#undef SERIALCOMMAND_HARDWAREONLY
-
-#ifdef SERIALCOMMAND_HARDWAREONLY
-#warning "Warning: Building SerialCommand without SoftwareSerial Support"
-#endif
-
-#ifndef SERIALCOMMAND_HARDWAREONLY
-#include <SoftwareSerial.h>
-#endif
-
 #include <string.h>
-
 
 #define SERIALCOMMAND_LINE_BUFFER 20
 #define SERIALCOMMAND_CMD_LENGTH 6
@@ -69,10 +49,7 @@
 class SerialCommand
 {
   public:
-    SerialCommand();      // Constructor
-#ifndef SERIALCOMMAND_HARDWAREONLY
-    SerialCommand(SoftwareSerial &SoftSer);  // Constructor for using SoftwareSerial objects
-#endif
+    SerialCommand(Stream& _stream);      // Constructor
 
     void setTerm(char _lineTerminator); // Sets the line terminator (default '\r')
 
@@ -98,9 +75,8 @@ class SerialCommand
     SerialCommandCallback CommandList[MAXSERIALCOMMANDS];   // Actual definition for command/handler array
     void (*defaultHandler)();           // Pointer to the default handler function
     int usingSoftwareSerial;            // Used as boolean to see if we're using SoftwareSerial object or not
-#ifndef SERIALCOMMAND_HARDWAREONLY
-    SoftwareSerial *SoftSerial;         // Pointer to a user-created SoftwareSerial object
-#endif
+    Stream *m_pStream;                  // Pointer to a user-created Stream object (which is the base class of Serial
+                                        // and SoftwareSerial
 };
 
 #endif //SerialCommand_h

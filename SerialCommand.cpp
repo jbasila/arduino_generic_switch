@@ -27,32 +27,17 @@
 
 
 #include <string.h>
-#ifndef SERIALCOMMAND_HARDWAREONLY
-#include <SoftwareSerial.h>
-#endif
 
-// Constructor makes sure some things are set.
-SerialCommand::SerialCommand()
-{
-  usingSoftwareSerial = 0;
-  strncpy(delim, " ", MAXDELIMETER); // strtok_r needs a null-terminated string
-  term = '\r'; // return character, default terminator for commands
-  numCommand = 0;  // Number of callback handlers installed
-  clearBuffer();
-}
-
-#ifndef SERIALCOMMAND_HARDWAREONLY
-// Constructor to use a SoftwareSerial object
-SerialCommand::SerialCommand(SoftwareSerial &_SoftSer)
+// Constructor
+SerialCommand::SerialCommand(Stream& _stream)
 {
   usingSoftwareSerial = 1;
-  SoftSerial = &_SoftSer;
+  m_pStream = &_stream;
   strncpy(delim, " ", MAXDELIMETER); // strtok_r needs a null-terminated string
   term = '\r'; // return character, default terminator for commands
   numCommand = 0;  // Number of callback handlers installed
   clearBuffer();
 }
-#endif
 
 //
 // Set the line terminator
@@ -87,24 +72,11 @@ char *SerialCommand::next()
 // buffer for a prefix command, and calls handlers setup by addCommand() member
 void SerialCommand::readSerial()
 {
-  // If we're using the Hardware port, check it.   Otherwise check the user-created SoftwareSerial Port
-#ifdef SERIALCOMMAND_HARDWAREONLY
-  while (Serial.available() > 0)
-#else
-  while ((usingSoftwareSerial == 0 && Serial.available() > 0) || (usingSoftwareSerial == 1 && SoftSerial->available() > 0) )
-#endif
+  while(m_pStream->available() > 0)
   {
     int i;
     boolean matched;
-    if (usingSoftwareSerial == 0) {
-      // Hardware serial port
-      inChar = Serial.read(); // Read single available character, there may be more waiting
-    } else {
-#ifndef SERIALCOMMAND_HARDWAREONLY
-      // SoftwareSerial port
-      inChar = SoftSerial->read();   // Read single available character, there may be more waiting
-#endif
-    }
+    inChar = m_pStream->read(); // Read single available character, there may be more waiting
 #ifdef SERIALCOMMANDDEBUG
     Serial.print(inChar);   // Echo back to serial stream
 #endif

@@ -3,8 +3,8 @@
 #include "pgmString.h"
 #include <EEPROM.h>
 
-#include "dataDumping.h"
 #include "configuration.h"
+#include "debugInfo.h"
 
 Configuration::Configuration(const int _iResetPin) :
   m_bRequireStoring(false),
