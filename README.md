@@ -1,4 +1,6 @@
-# Home automation with Arduino
+# Tabbouleh - Arduino code
+
+### Introduction
 Although there are many projects that use Arduino for home automation, this specific project aims on creating a generic device based on Arduino for use with different switches.
 
 The idea is to upload the code once to the ATMEL chip and the configuration of which device is connected to which pin can be done remotely. In other words, the only action required here is uploading the sketch to the ATMEL ([Arduino]) and that is it.
