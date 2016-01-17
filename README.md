@@ -16,7 +16,7 @@ It started when I wanted to control the lights in the house based on certian log
 
 The challenge here is to integrate with the current light switches in the house without having a centrelized distribution box.
 
-The communication will based on bluetooth using a bluetooth module for Arduino - The one that was used for this project was the [HC-06]. The HC-05 also will serve the purpose.
+The communication will be based on bluetooth using a bluetooth module for Arduino - The one that was used for this project was the [HC-06]. The HC-05 also will serve the purpose.
 
 For example, when it's dark and there is movement in the living room, turn on the lights. If it's late at night then probably best to dimm the lights and fade-in the light and fade-out when movement stopped for a certian interval.
 
@@ -29,7 +29,7 @@ All this is nice, but the main challenge is to make all of this happen without c
 ## Down to business
 So what does this code do? Let's start with a diagram:
 
-![Sample House Diagram](http://still.does.not.exist "Sample House Diagram")
+![Sample House Diagram](https://github.com/jbasila/tabbouleh-arduino-switch/blob/master/images/Sample_House_Diagram.jpg?raw=true "Example 1")
 
 In the above diagram, there are movement sensors, light intensity sensor, moister sensor and light switches. All these sensors and switches communicate via bluetooth to the main control system which uses a Raspberry Pi based system. Each element in the diagram (sensors, motion detectores and switches) are all using the same code. The only differance is the configuraiton done for each one of them.
 
@@ -38,7 +38,7 @@ This Arduino code will provide a user interface via a command line interface (CL
 
 The PINs of the Arduino that will be used are as follows:
 
-|INDEX | INPUT PIN | OUTPUT PIN|
+|INDEX | IN PIN | OUT PIN|
 |:-:|:-:|:-:|
 |**0** | 8 | A0|
 |**1** | 9 | A1|
