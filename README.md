@@ -29,7 +29,7 @@ All this is nice, but the main challenge is to make all of this happen without c
 ## Down to business
 So what does this code do? Let's start with a diagram:
 
-![Sample House Diagram](https://github.com/jbasila/tabbouleh-arduino-switch/blob/master/images/Sample_House_Diagram.jpg?raw=true "Example 1")
+![Sample House Diagram](/images/Sample_House_Diagram.jpg?raw=true "Example 1")
 
 In the above diagram, there are movement sensors, light intensity sensor, moister sensor and light switches. All these sensors and switches communicate via bluetooth to the main control system which uses a Raspberry Pi based system. Each element in the diagram (sensors, motion detectores and switches) are all using the same code. The only differance is the configuraiton done for each one of them.
 
