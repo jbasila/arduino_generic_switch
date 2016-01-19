@@ -6,6 +6,8 @@
 #define NUMBER_OF_DEVICES 6
 #define PRIVATE_DATA_SIZE 4
 
+#define BT_DEVICE_NAME_MAX_LEN 16
+
 class Configuration {
   public:
     enum SupportedDevices {
@@ -55,6 +57,11 @@ class Configuration {
         byte m_magic[sizeof(HEADER_MAGIC) - 1];
         byte m_size;
       } m_header;
+      struct {
+        byte m_baudRate;
+        char m_deviceName[BT_DEVICE_NAME_MAX_LEN + 1];
+        char m_pinCode[4];
+      } m_bluetoothConfiguration;
       struct {
         SupportedDevices m_deviceId;
         byte m_param1;
