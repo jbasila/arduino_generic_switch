@@ -23,6 +23,13 @@ class Configuration {
         byte m_privateData[PRIVATE_DATA_SIZE];
     };
 
+    class BluetoothConfiguration {
+      public:
+        long m_baudRate;
+        char m_deviceName[BT_DEVICE_NAME_MAX_LEN + 1];
+        char m_pin[5];
+    };
+
     Configuration(const int _iResetPin);
     ~Configuration();
 
@@ -32,6 +39,9 @@ class Configuration {
     bool restoreConfiguration();
     bool storeConfiguration();
 
+    BluetoothConfiguration getBluetoothConfiguration();
+    void setBluetoothConfiguration(const BluetoothConfiguration& _bluetoothConfiguration);
+
     byte maxNumberOfDevices();
 
     bool getDeviceParams(const byte _deviceIndex,
@@ -39,7 +49,7 @@ class Configuration {
                          byte& _param1,
                          byte& _param2,
                          Configuration::PrivateData& _privateData);
-                         
+
     bool setDeviceParams(const byte _deviceIndex,
                          const SupportedDevices _deviceId,
                          const byte _param1,
@@ -57,11 +67,7 @@ class Configuration {
         byte m_magic[sizeof(HEADER_MAGIC) - 1];
         byte m_size;
       } m_header;
-      struct {
-        byte m_baudRate;
-        char m_deviceName[BT_DEVICE_NAME_MAX_LEN + 1];
-        char m_pinCode[4];
-      } m_bluetoothConfiguration;
+      BluetoothConfiguration m_bluetoothConfiguration;
       struct {
         SupportedDevices m_deviceId;
         byte m_param1;

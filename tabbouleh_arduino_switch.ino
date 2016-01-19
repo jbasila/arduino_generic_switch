@@ -21,24 +21,45 @@ BluetoothConnector* g_pBluetoothConnector = NULL;
 
 Stream* g_pStream = NULL;
 
-void initializeStream() {
+bool initializeStream() {
   Serial.begin(9600);
   g_pBluetoothConnector = new BluetoothConnector(BLUETOOTH_RX, BLUETOOTH_TX, BLUETOOTH_POWER_PIN);
-  if (g_pBluetoothConnector->detectBaudRate())
-    Serial.println("FOUND IT");
 
-  if (g_pBluetoothConnector->setBaudRate(7))
-    Serial.println("BAUD set");
-  else
-    Serial.println("BAUD FAILED set");
+  bool _bRequireConfigurationUpdate = false;
+  Configuration::BluetoothConfiguration _bluetoothConfiguration = g_cConfiguration.getBluetoothConfiguration();
+  if (!_bluetoothConfiguration.m_baudRate) {
+    _bRequireConfigurationUpdate = true;
+    sprintf(_bluetoothConfiguration.m_deviceName, "UnnamedDevice");
+    sprintf(_bluetoothConfiguration.m_pin, "0000");
+  }
+
+  if (!g_pBluetoothConnector->checkBaudRate(_bluetoothConfiguration.m_baudRate)) {
+    if (!g_pBluetoothConnector->detectBaudRate(_bluetoothConfiguration.m_baudRate))
+      return false;
+
+    _bRequireConfigurationUpdate = true;
+  }
+
+  Serial.println(_bRequireConfigurationUpdate ? "Config Update" : "restore");
+  Serial.print("Setting parameters: ");
+  Serial.print(_bluetoothConfiguration.m_baudRate);
+  Serial.print(" - ");
+  Serial.print(_bluetoothConfiguration.m_pin);
+  Serial.print(" - ");
+  Serial.println(_bluetoothConfiguration.m_deviceName);
+  g_pBluetoothConnector->setPin(_bluetoothConfiguration.m_pin);
+  g_pBluetoothConnector->setDeviceName(_bluetoothConfiguration.m_deviceName);
+
+  if (_bRequireConfigurationUpdate)
+    g_cConfiguration.setBluetoothConfiguration(_bluetoothConfiguration);
+
   g_pStream = g_pBluetoothConnector->getStream();
-  //  g_pStream = &Serial;
+  //    g_pStream = &Serial;
 }
 
 void setup() {
-  initializeStream();
-
   bool _restore = g_cConfiguration.restoreConfiguration();
+  initializeStream();
   bool _store = g_cConfiguration.storeConfiguration();
 
   //  dumpConfigurationAndEeprom(*g_pStream, g_cConfiguration, _restore, _store);
@@ -55,6 +76,7 @@ void setup() {
   cliCommands_init(*g_pStream, g_cDeviceContainer, g_cConfiguration);
 
   g_pStream->print("\n\nREADY\n");
+  Serial.println("\n\nREADY\n");
 }
 
 void loop() {

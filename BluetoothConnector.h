@@ -19,8 +19,8 @@ class BluetoothConnector {
     bool checkValidResponse();
     int m_powerPin;
 
-    byte convert(const long _baudRate);
-    long convert(const byte _baudRateCode);
+    byte convertFromBaudRate(const long _baudRate);
+    long convertToBaudRate(const byte _baudRateCode);
     
     SoftwareSerial m_bluetoothSerial;
 };

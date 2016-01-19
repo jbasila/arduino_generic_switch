@@ -99,6 +99,15 @@ bool Configuration::storeConfiguration() {
   return _bReturnValue;
 }
 
+Configuration::BluetoothConfiguration Configuration::getBluetoothConfiguration() {
+  return g_configuration.m_bluetoothConfiguration;
+}
+
+void Configuration::setBluetoothConfiguration(const BluetoothConfiguration& _bluetoothConfiguration) {
+  g_configuration.m_bluetoothConfiguration = _bluetoothConfiguration;
+  m_bRequireStoring = true;
+}
+
 byte Configuration::maxNumberOfDevices() {
   return NUMBER_OF_DEVICES;
 }
