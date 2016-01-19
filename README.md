@@ -7,7 +7,7 @@ This code provides a command line interface for the [Arduino] (or ATMEL chip) vi
 
 This code for the Arduino is part of the larger project [Tabbouleh] - a DIY home automation.
 
-Although there are many projects that use Arduino or [Raspberry PI] for home automation, this specific project aims on creating a generic device based on Arduino for use with different switches and sensors.
+Although there are many projects that use Arduino or [Raspberry PI][RPi] for home automation, this specific project aims on creating a generic device based on Arduino for use with different switches and sensors.
 
 The idea is to upload the code once to the ATMEL chip without modification done to the code. The configuration of the devices that are connected to which pin can be done remotely via a command line interface.
 
@@ -39,18 +39,18 @@ This Arduino code will provide a user interface via a command line interface (CL
 The PINs of the Arduino that will be used are as follows:
 
 |INDEX | IN PIN | OUT PIN|
-|:-:|:-:|:-:|
-|**0** | 8 | A0|
-|**1** | 9 | A1|
-|**2** | 10 | A2|
-|**3** | 11 | A3|
-|**4** | 12 | A4|
-|**5** | 13 | A5|
+|:----:|:------:|:------:|
+|**0** | 8      | A0     |
+|**1** | 9      | A1     |
+|**2** | 10     | A2     |
+|**3** | 11     | A3     |
+|**4** | 12     | A4     |
+|**5** | 13     | A5     |
 
 ### 
 
 [//]:# (Links mapping)
 [Arduino]: https://www.arduino.cc/
-[Raspberry PI]: https://www.raspberrypi.org/
+[RPi]: https://www.raspberrypi.org/
 [Tabbouleh]: https://still.did.not.create.a.site
 [Arduino IDE]: https://www.arduino.cc/en/Main/Software
