@@ -7,17 +7,20 @@ class BluetoothConnector {
     BluetoothConnector(int _rx, int _tx, int _powerPin);
     ~BluetoothConnector();
 
-    bool detectBaudRate();
+    bool checkBaudRate(const long _baudRate);
+    bool detectBaudRate(long& _detectedBaudRate);
     bool setDeviceName(const String& _deviceName);
-    bool setBaudRate(const byte _baudRate);
+    bool setBaudRate(const long _baudRate);
     bool setPin(const String& _pinCode);
 
     Stream* getStream();
 
   private:
-    bool checkBaudRate(long _baudRate);
     bool checkValidResponse();
     int m_powerPin;
+
+    byte convert(const long _baudRate);
+    long convert(const byte _baudRateCode);
     
     SoftwareSerial m_bluetoothSerial;
 };

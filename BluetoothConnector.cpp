@@ -41,7 +41,11 @@ bool BluetoothConnector::setBaudRate(const byte _baudRate) {
   while (m_bluetoothSerial.read() != -1);
   m_bluetoothSerial.print(getPgmString(STR_ATBAUD));
   m_bluetoothSerial.print((char)(_baudRate + '0'));
-  return checkValidResponse();
+
+  if (!checkValidResponse())
+    return false;
+
+  m_bluetoothSerial.begin(_baudRate);
 }
 
 bool BluetoothConnector::setPin(const String& _pinCode) {
@@ -78,5 +82,13 @@ bool BluetoothConnector::checkValidResponse() {
   }
 
   return _bReturnValue;
+}
+
+byte BluetoothConnector::convert(const long _baudRate) {
+
+}
+
+long BluetoothConnector::convert(const byte _baudRateCode) {
+
 }
 
