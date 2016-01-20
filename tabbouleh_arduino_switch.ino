@@ -22,16 +22,11 @@ BluetoothConnector* g_pBluetoothConnector = NULL;
 Stream* g_pStream = NULL;
 
 bool initializeStream() {
-  Serial.begin(9600);
+  Serial.begin(57200);
   g_pBluetoothConnector = new BluetoothConnector(BLUETOOTH_RX, BLUETOOTH_TX, BLUETOOTH_POWER_PIN);
 
   bool _bRequireConfigurationUpdate = false;
   Configuration::BluetoothConfiguration _bluetoothConfiguration = g_cConfiguration.getBluetoothConfiguration();
-  if (!_bluetoothConfiguration.m_baudRate) {
-    _bRequireConfigurationUpdate = true;
-    sprintf(_bluetoothConfiguration.m_deviceName, "UnnamedDevice");
-    sprintf(_bluetoothConfiguration.m_pin, "0000");
-  }
 
   if (!g_pBluetoothConnector->checkBaudRate(_bluetoothConfiguration.m_baudRate)) {
     if (!g_pBluetoothConnector->detectBaudRate(_bluetoothConfiguration.m_baudRate))
@@ -42,24 +37,22 @@ bool initializeStream() {
 
   Serial.println(_bRequireConfigurationUpdate ? "Config Update" : "restore");
   Serial.print("Setting parameters: ");
-  Serial.print(_bluetoothConfiguration.m_baudRate);
-  Serial.print(" - ");
-  Serial.print(_bluetoothConfiguration.m_pin);
-  Serial.print(" - ");
-  Serial.println(_bluetoothConfiguration.m_deviceName);
-  g_pBluetoothConnector->setPin(_bluetoothConfiguration.m_pin);
-  g_pBluetoothConnector->setDeviceName(_bluetoothConfiguration.m_deviceName);
+  Serial.println(_bluetoothConfiguration.m_baudRate);
 
   if (_bRequireConfigurationUpdate)
     g_cConfiguration.setBluetoothConfiguration(_bluetoothConfiguration);
 
   g_pStream = g_pBluetoothConnector->getStream();
-  //    g_pStream = &Serial;
+  //  g_pStream = &Serial;
 }
 
 void setup() {
   bool _restore = g_cConfiguration.restoreConfiguration();
-  initializeStream();
+  if (!initializeStream()) {
+    Serial.println("FAITAL: bluetooth device not initialized");
+    return;
+  }
+  
   bool _store = g_cConfiguration.storeConfiguration();
 
   //  dumpConfigurationAndEeprom(*g_pStream, g_cConfiguration, _restore, _store);

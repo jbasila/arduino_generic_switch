@@ -26,8 +26,6 @@ class Configuration {
     class BluetoothConfiguration {
       public:
         long m_baudRate;
-        char m_deviceName[BT_DEVICE_NAME_MAX_LEN + 1];
-        char m_pin[5];
     };
 
     Configuration(const int _iResetPin);

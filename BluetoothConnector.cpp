@@ -68,29 +68,37 @@ bool BluetoothConnector::checkBaudRate(long _baudRate) {
   digitalWrite(m_powerPin, HIGH);
   delay(250);
   digitalWrite(m_powerPin, LOW);
-  delay(1000);
   m_bluetoothSerial.begin(_baudRate);
-  while (m_bluetoothSerial.read() != -1);
-
-  m_bluetoothSerial.print("AT");
+  // Give the device some time to reset
   delay(1000);
+  m_bluetoothSerial.print("AT");
   return checkValidResponse();
 }
 
 bool BluetoothConnector::checkValidResponse() {
   bool _bReturnValue = false;
 
-  delay(2000);
-  if (m_bluetoothSerial.read() == 'O') {
-    if (m_bluetoothSerial.read() == 'K') {
-      do {
-        delay(200);
-      } while (m_bluetoothSerial.read() != -1);
+  if (blockingRead(1000) == 'O') {
+    if (blockingRead(1000) == 'K') {
+      while (blockingRead(200) != -1);
+
       _bReturnValue = true;
     }
   }
 
   return _bReturnValue;
+}
+
+int BluetoothConnector::blockingRead(unsigned long _timeout) {
+  int _iReturnValue = -1;
+
+  unsigned long _timeToStop = millis() + _timeout;
+  while ((_iReturnValue = m_bluetoothSerial.read()) == -1) {
+    if (millis() >= _timeToStop)
+      break;
+  }
+
+  return _iReturnValue;
 }
 
 byte BluetoothConnector::convertFromBaudRate(const long _baudRate) {

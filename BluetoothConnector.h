@@ -17,6 +17,8 @@ class BluetoothConnector {
 
   private:
     bool checkValidResponse();
+    int blockingRead(unsigned long _timeout);
+    
     int m_powerPin;
 
     byte convertFromBaudRate(const long _baudRate);
