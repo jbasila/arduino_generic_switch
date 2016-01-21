@@ -40,7 +40,7 @@ bool BluetoothConnector::setDeviceName(const String& _deviceName) {
 }
 
 bool BluetoothConnector::setBaudRate(const long _baudRate) {
-  flushInputBuffer();
+  powerCycle();
   m_bluetoothSerial.print(getPgmString(STR_ATBAUD));
   m_bluetoothSerial.print((char)(convertFromBaudRate(_baudRate) + '0'));
 
@@ -51,9 +51,17 @@ bool BluetoothConnector::setBaudRate(const long _baudRate) {
 }
 
 bool BluetoothConnector::setPin(const String& _pinCode) {
-  flushInputBuffer();
+  powerCycle();
   m_bluetoothSerial.print(getPgmString(STR_ATPIN) + _pinCode);
   return checkValidResponse();
+}
+
+void BluetoothConnector::powerCycle() {
+  digitalWrite(m_powerPin, HIGH);
+  delay(250);
+  digitalWrite(m_powerPin, LOW);
+  // Give the device some time to reset
+  delay(1000);
 }
 
 Stream* BluetoothConnector::getStream() {
@@ -65,13 +73,10 @@ bool BluetoothConnector::checkBaudRate(long _baudRate) {
     return false;
 
   m_bluetoothSerial.end();
-  digitalWrite(m_powerPin, HIGH);
-  delay(250);
-  digitalWrite(m_powerPin, LOW);
+  powerCycle();
   m_bluetoothSerial.begin(_baudRate);
-  // Give the device some time to reset
-  delay(1000);
   m_bluetoothSerial.print("AT");
+  
   return checkValidResponse();
 }
 

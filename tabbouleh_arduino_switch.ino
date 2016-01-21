@@ -15,14 +15,14 @@
 
 #define RESET_CONFIGURATION_PIN 7
 
-Configuration g_cConfiguration(RESET_CONFIGURATION_PIN);
-DeviceContainer g_cDeviceContainer;
-BluetoothConnector* g_pBluetoothConnector = NULL;
+static Configuration g_cConfiguration(RESET_CONFIGURATION_PIN);
+static DeviceContainer g_cDeviceContainer;
+static BluetoothConnector* g_pBluetoothConnector = NULL;
 
 Stream* g_pStream = NULL;
 
 bool initializeStream(bool _resetToFactory) {
-  Serial.begin(57200);
+  Serial.begin(57600);
   g_pBluetoothConnector = new BluetoothConnector(BLUETOOTH_RX, BLUETOOTH_TX, BLUETOOTH_POWER_PIN);
 
   bool _bRequireConfigurationUpdate = _resetToFactory;
@@ -71,7 +71,7 @@ void setup() {
       g_cDeviceContainer.setLogic(_index, _deviceId, _param1, _param2, _privateData);
   }
 
-  cliCommands_init(*g_pStream, g_cDeviceContainer, g_cConfiguration);
+  cliCommands_init(*g_pStream, g_cDeviceContainer, g_cConfiguration, *g_pBluetoothConnector);
 
   String _ready = getPgmString(STR_READY);
   g_pStream->print(_ready);

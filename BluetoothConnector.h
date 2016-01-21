@@ -13,6 +13,8 @@ class BluetoothConnector {
     bool setBaudRate(const long _baudRate);
     bool setPin(const String& _pinCode);
 
+    void powerCycle();
+
     Stream* getStream();
 
   private:

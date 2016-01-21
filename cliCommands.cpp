@@ -1,16 +1,19 @@
 
 #include <Arduino.h>
+#include <SoftwareSerial.h>
 
 #include "SerialCommand.h"
 #include "pgmString.h"
 #include "configuration.h"
 #include "ILogic.h"
 #include "deviceContainer.h"
+#include "BluetoothConnector.h"
 
-Stream* g_pStreamToUse = NULL;
-SerialCommand* g_pSerialCommand = NULL;
-DeviceContainer* g_pDeviceContainer = NULL;
-Configuration* g_pConfiguration = NULL;
+static Stream* g_pStreamToUse = NULL;
+static SerialCommand* g_pSerialCommand = NULL;
+static DeviceContainer* g_pDeviceContainer = NULL;
+static Configuration* g_pConfiguration = NULL;
+static BluetoothConnector* g_pBluetoothConnector = NULL;
 
 static void commandHelp() {
   g_pStreamToUse->print(getPgmString(STR_COMMAND_HELP));
@@ -248,15 +251,51 @@ static void commandFreeMem() {
   }
 }
 
+static void commandBtSetPin() {
+  char* _pToken = g_pSerialCommand->next();
+  if (!_pToken) {
+    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_SET_USAGE));
+    return;
+  }
+
+  String _sName = _pToken;
+  _pToken = g_pSerialCommand->next();
+  if (!_pToken) {
+    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_SET_USAGE));
+    return;
+  }
+
+  String _sPin = _pToken;
+  if (_sPin.length() != 4) {
+    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_SET_USAGE));
+    return;
+  }
+
+  int _iIndex = 0;
+  for (_iIndex = 0; _iIndex < 4; ++_iIndex) {
+    if (!isDigit(_sPin[_iIndex])) {
+      g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_SET_USAGE));
+      return;
+    }
+  }
+
+  g_pBluetoothConnector->setPin(_sPin);
+  g_pBluetoothConnector->setDeviceName(_sName);
+}
+
 static void commandUnknown() {
   g_pStreamToUse->print(getPgmString(STR_COMMAND_UNKNOWN));
 }
 
-bool cliCommands_init(Stream& _stream, DeviceContainer& _deviceContainer, Configuration& _configuration) {
+bool cliCommands_init(Stream& _stream,
+                      DeviceContainer& _deviceContainer,
+                      Configuration& _configuration,
+                      BluetoothConnector& _pBluetoothConnector) {
   g_pStreamToUse = &_stream;
   g_pDeviceContainer = &_deviceContainer;
   g_pConfiguration = &_configuration;
-  
+  g_pBluetoothConnector = &_pBluetoothConnector;
+
   g_pSerialCommand = new SerialCommand(*g_pStreamToUse);
   g_pSerialCommand->setTerm('\n');
   g_pSerialCommand->addCommand("?", commandHelp);
@@ -266,6 +305,8 @@ bool cliCommands_init(Stream& _stream, DeviceContainer& _deviceContainer, Config
   g_pSerialCommand->addCommand(getPgmString(STR_CMD_SAVE).c_str(), commandSave);
 
   g_pSerialCommand->addCommand(getPgmString(STR_CMD_ACTION).c_str(), commandAction);
+
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_BT).c_str(), commandBtSetPin);
 
   g_pSerialCommand->addCommand(getPgmString(STR_CMD_FREE).c_str(), commandFreeMem);
   g_pSerialCommand->addDefaultHandler(commandUnknown);
