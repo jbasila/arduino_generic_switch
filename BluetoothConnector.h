@@ -17,6 +17,7 @@ class BluetoothConnector {
 
   private:
     bool checkValidResponse();
+    void flushInputBuffer();
     int blockingRead(unsigned long _timeout);
     
     int m_powerPin;

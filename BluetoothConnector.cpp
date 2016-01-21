@@ -34,13 +34,13 @@ bool BluetoothConnector::detectBaudRate(long& _detectedBaudRate) {
 }
 
 bool BluetoothConnector::setDeviceName(const String& _deviceName) {
-  while (m_bluetoothSerial.read() != -1);
+  flushInputBuffer();
   m_bluetoothSerial.print(getPgmString(STR_ATNAME) + _deviceName);
   return checkValidResponse();
 }
 
 bool BluetoothConnector::setBaudRate(const long _baudRate) {
-  while (m_bluetoothSerial.read() != -1);
+  flushInputBuffer();
   m_bluetoothSerial.print(getPgmString(STR_ATBAUD));
   m_bluetoothSerial.print((char)(convertFromBaudRate(_baudRate) + '0'));
 
@@ -51,7 +51,7 @@ bool BluetoothConnector::setBaudRate(const long _baudRate) {
 }
 
 bool BluetoothConnector::setPin(const String& _pinCode) {
-  while (m_bluetoothSerial.read() != -1);
+  flushInputBuffer();
   m_bluetoothSerial.print(getPgmString(STR_ATPIN) + _pinCode);
   return checkValidResponse();
 }
@@ -80,13 +80,17 @@ bool BluetoothConnector::checkValidResponse() {
 
   if (blockingRead(1000) == 'O') {
     if (blockingRead(1000) == 'K') {
-      while (blockingRead(200) != -1);
+      flushInputBuffer();
 
       _bReturnValue = true;
     }
   }
 
   return _bReturnValue;
+}
+
+void BluetoothConnector::flushInputBuffer() {
+  while (blockingRead(200) != -1);
 }
 
 int BluetoothConnector::blockingRead(unsigned long _timeout) {

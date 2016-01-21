@@ -21,11 +21,11 @@ BluetoothConnector* g_pBluetoothConnector = NULL;
 
 Stream* g_pStream = NULL;
 
-bool initializeStream() {
+bool initializeStream(bool _resetToFactory) {
   Serial.begin(57200);
   g_pBluetoothConnector = new BluetoothConnector(BLUETOOTH_RX, BLUETOOTH_TX, BLUETOOTH_POWER_PIN);
 
-  bool _bRequireConfigurationUpdate = false;
+  bool _bRequireConfigurationUpdate = _resetToFactory;
   Configuration::BluetoothConfiguration _bluetoothConfiguration = g_cConfiguration.getBluetoothConfiguration();
 
   if (!g_pBluetoothConnector->checkBaudRate(_bluetoothConfiguration.m_baudRate)) {
@@ -35,21 +35,26 @@ bool initializeStream() {
     _bRequireConfigurationUpdate = true;
   }
 
-  Serial.println(_bRequireConfigurationUpdate ? "Config Update" : "restore");
-  Serial.print("Setting parameters: ");
+  if(_resetToFactory) {
+    g_pBluetoothConnector->setDeviceName(getPgmString(STR_BT_DEFAULT_NAME));
+    g_pBluetoothConnector->setPin(getPgmString(STR_BT_DEFAULT_PIN));
+  }
+
+  Serial.println(_bRequireConfigurationUpdate ? getPgmString(STR_CFG_UPDATE) : getPgmString(STR_CFG_RESTORED));
+  Serial.print(getPgmString(STR_SETTING_PARAMS));
   Serial.println(_bluetoothConfiguration.m_baudRate);
 
   if (_bRequireConfigurationUpdate)
     g_cConfiguration.setBluetoothConfiguration(_bluetoothConfiguration);
 
-  g_pStream = g_pBluetoothConnector->getStream();
+    g_pStream = g_pBluetoothConnector->getStream();
   //  g_pStream = &Serial;
 }
 
 void setup() {
   bool _restore = g_cConfiguration.restoreConfiguration();
-  if (!initializeStream()) {
-    Serial.println("FAITAL: bluetooth device not initialized");
+  if (!initializeStream(!_restore)) {
+    Serial.println(getPgmString(STR_FATAL_BT));
     return;
   }
   
@@ -68,8 +73,9 @@ void setup() {
 
   cliCommands_init(*g_pStream, g_cDeviceContainer, g_cConfiguration);
 
-  g_pStream->print("\n\nREADY\n");
-  Serial.println("\n\nREADY\n");
+  String _ready = getPgmString(STR_READY);
+  g_pStream->print(_ready);
+  Serial.println(_ready);
 }
 
 void loop() {
