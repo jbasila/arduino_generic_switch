@@ -10,6 +10,7 @@ class BluetoothConnector {
     bool checkBaudRate(const long _baudRate);
     bool detectBaudRate(long& _detectedBaudRate);
     bool setDeviceName(const String& _deviceName);
+    bool isValidBaudRate(const long _baudRate);
     bool setBaudRate(const long _baudRate);
     bool setPin(const String& _pinCode);
 
@@ -21,12 +22,12 @@ class BluetoothConnector {
     bool checkValidResponse();
     void flushInputBuffer();
     int blockingRead(unsigned long _timeout);
-    
+
     int m_powerPin;
 
     byte convertFromBaudRate(const long _baudRate);
     long convertToBaudRate(const byte _baudRateCode);
-    
+
     SoftwareSerial m_bluetoothSerial;
 };
 

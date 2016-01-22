@@ -39,6 +39,10 @@ bool BluetoothConnector::setDeviceName(const String& _deviceName) {
   return checkValidResponse();
 }
 
+bool BluetoothConnector::isValidBaudRate(const long _baudRate) {
+  return convertFromBaudRate(_baudRate) > 0;
+}
+
 bool BluetoothConnector::setBaudRate(const long _baudRate) {
   powerCycle();
   m_bluetoothSerial.print(getPgmString(STR_ATBAUD));

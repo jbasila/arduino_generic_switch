@@ -35,9 +35,12 @@ bool initializeStream(bool _resetToFactory) {
     _bRequireConfigurationUpdate = true;
   }
 
-  if(_resetToFactory) {
-    g_pBluetoothConnector->setDeviceName(getPgmString(STR_BT_DEFAULT_NAME));
-    g_pBluetoothConnector->setPin(getPgmString(STR_BT_DEFAULT_PIN));
+  if (_resetToFactory) {
+    if (!g_pBluetoothConnector->setDeviceName(getPgmString(STR_BT_DEFAULT_NAME)))
+      Serial.println(getPgmString(STR_DBG_BT_FAILED_SET_DEVICE_NAME));
+    delay(1000);
+    if (!g_pBluetoothConnector->setPin(getPgmString(STR_BT_DEFAULT_PIN)))
+      Serial.println(getPgmString(STR_DBG_BT_FAILED_SET_PIN));
   }
 
   Serial.println(_bRequireConfigurationUpdate ? getPgmString(STR_CFG_UPDATE) : getPgmString(STR_CFG_RESTORED));
@@ -47,7 +50,7 @@ bool initializeStream(bool _resetToFactory) {
   if (_bRequireConfigurationUpdate)
     g_cConfiguration.setBluetoothConfiguration(_bluetoothConfiguration);
 
-    g_pStream = g_pBluetoothConnector->getStream();
+  g_pStream = g_pBluetoothConnector->getStream();
   //  g_pStream = &Serial;
 }
 
@@ -57,7 +60,7 @@ void setup() {
     Serial.println(getPgmString(STR_FATAL_BT));
     return;
   }
-  
+
   bool _store = g_cConfiguration.storeConfiguration();
 
   //  dumpConfigurationAndEeprom(*g_pStream, g_cConfiguration, _restore, _store);

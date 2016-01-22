@@ -251,36 +251,54 @@ static void commandFreeMem() {
   }
 }
 
-static void commandBtSetPin() {
-  char* _pToken = g_pSerialCommand->next();
-  if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_SET_USAGE));
+static void commandBt() {
+  char* _pToken = NULL;
+  if (!(_pToken = g_pSerialCommand->next())) {
+    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_USAGE));
     return;
   }
+  String _sBaud = _pToken;
 
+  if (!(_pToken = g_pSerialCommand->next())) {
+    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_USAGE));
+    return;
+  }
   String _sName = _pToken;
-  _pToken = g_pSerialCommand->next();
-  if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_SET_USAGE));
+
+  if (!(_pToken = g_pSerialCommand->next())) {
+    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_USAGE));
+    return;
+  }
+  String _sPin = _pToken;
+
+  long _baudRate = _sBaud.toInt();
+  if (!g_pBluetoothConnector->isValidBaudRate(_baudRate)) {
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_BT_ERROR_INVALID_BAUD_RATE) + _sBaud);
     return;
   }
 
-  String _sPin = _pToken;
   if (_sPin.length() != 4) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_BT_ERROR_INVALID_PIN_CODE) + _sPin);
     return;
   }
 
   int _iIndex = 0;
   for (_iIndex = 0; _iIndex < 4; ++_iIndex) {
     if (!isDigit(_sPin[_iIndex])) {
-      g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_SET_USAGE));
+      g_pStreamToUse->println(getPgmString(STR_COMMAND_BT_ERROR_INVALID_PIN_CODE) + _sPin);
       return;
     }
   }
 
-  g_pBluetoothConnector->setPin(_sPin);
-  g_pBluetoothConnector->setDeviceName(_sName);
+  if (!g_pBluetoothConnector->setPin(_sPin))
+    Serial.println(getPgmString(STR_DBG_BT_FAILED_SET_PIN));
+  delay(1000);
+  if (!g_pBluetoothConnector->setDeviceName(_sName))
+    Serial.println(getPgmString(STR_DBG_BT_FAILED_SET_DEVICE_NAME));
+  delay(1000);
+  if (!g_pBluetoothConnector->setBaudRate(_baudRate))
+    Serial.println(getPgmString(STR_DBG_BT_FAILED_SET_BAUD_RATE));
+  delay(1000);
 }
 
 static void commandUnknown() {
@@ -306,7 +324,7 @@ bool cliCommands_init(Stream& _stream,
 
   g_pSerialCommand->addCommand(getPgmString(STR_CMD_ACTION).c_str(), commandAction);
 
-  g_pSerialCommand->addCommand(getPgmString(STR_CMD_BT).c_str(), commandBtSetPin);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_BT).c_str(), commandBt);
 
   g_pSerialCommand->addCommand(getPgmString(STR_CMD_FREE).c_str(), commandFreeMem);
   g_pSerialCommand->addDefaultHandler(commandUnknown);
