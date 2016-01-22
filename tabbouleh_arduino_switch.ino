@@ -44,7 +44,7 @@ bool initializeStream(bool _resetToFactory) {
   }
 
   Serial.println(_bRequireConfigurationUpdate ? getPgmString(STR_CFG_UPDATE) : getPgmString(STR_CFG_RESTORED));
-  Serial.print(getPgmString(STR_SETTING_PARAMS));
+  Serial.print(getPgmString(STR_CFG_BAUD_RATE));
   Serial.println(_bluetoothConfiguration.m_baudRate);
 
   if (_bRequireConfigurationUpdate)

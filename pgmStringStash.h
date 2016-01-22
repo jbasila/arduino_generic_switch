@@ -11,7 +11,7 @@ PGM_STRING(STR_FATAL_BT, "FATAL: bluetooth device not initialized")
 PGM_STRING(STR_READY, "\n\nREADY\n")
 PGM_STRING(STR_CFG_UPDATE, "Config Update")
 PGM_STRING(STR_CFG_RESTORED, "restored")
-PGM_STRING(STR_SETTING_PARAMS, "Setting parameters: ")
+PGM_STRING(STR_CFG_BAUD_RATE, "Setting the baud rate to: ")
 
 PGM_STRING(STR_CMD_LIST, "list")
 PGM_STRING(STR_CMD_SET, "set")

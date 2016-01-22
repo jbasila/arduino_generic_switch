@@ -150,7 +150,7 @@ static void commandClear() {
 
   Configuration::PrivateData _privateData;
   memset(&_privateData, 0, sizeof(_privateData));
-  if (_sIndex = "all") {
+  if (_sIndex == "all") {
     int _index;
     for (_index = 0; _index < NUMBER_OF_DEVICES; ++_index) {
       g_pDeviceContainer->clearLogic(_index);
