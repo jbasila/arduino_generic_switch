@@ -16,13 +16,39 @@ static Configuration* g_pConfiguration = NULL;
 static BluetoothConnector* g_pBluetoothConnector = NULL;
 
 static void commandHelp() {
-  g_pStreamToUse->print(getPgmString(STR_COMMAND_HELP));
+  char* _pToken = g_pSerialCommand->next();
+  if (!_pToken) {
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_HELP));
+    g_pStreamToUse->println();
+    return;
+  }
+  String _sCommand = _pToken;
+
+  _pToken = g_pSerialCommand->next();
+  if (_pToken) {
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_HELP_USAGE));
+    g_pStreamToUse->println();
+    return;
+  }
+
+  if (_sCommand == getPgmString(STR_CMD_SET)) {
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_HELP_SET));
+    g_pStreamToUse->println();
+  } else if (_sCommand == getPgmString(STR_CMD_ACTION)) {
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_ACTION_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_HELP_ACTION));
+    g_pStreamToUse->println();
+  } else {
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_HELP_USAGE));
+    g_pStreamToUse->println();
+  }
 }
 
 static void commandList() {
   char _atmpBuffer[64] = { 0 };
-  g_pStreamToUse->print(getPgmString(STR_COMMAND_LIST_FORMAT_HEADER));
-  g_pStreamToUse->print(getPgmString(STR_COMMAND_LIST_FORMAT_LINE));
+  g_pStreamToUse->println(getPgmString(STR_COMMAND_LIST_FORMAT_HEADER));
+  g_pStreamToUse->println(getPgmString(STR_COMMAND_LIST_FORMAT_LINE));
 
   ILogic* _pIlogic = NULL;
   String _sFormatString = getPgmString(STR_COMMAND_LIST_FORMAT_STRING);
@@ -53,60 +79,60 @@ static void commandList() {
             _privateData.m_privateData[1],
             _privateData.m_privateData[2],
             _privateData.m_privateData[3]);
-    g_pStreamToUse->print(_atmpBuffer);
+    g_pStreamToUse->println(_atmpBuffer);
   }
-  g_pStreamToUse->print('\n');
+  g_pStreamToUse->println();
 }
 
 static void commandSet() {
   char* _pToken = g_pSerialCommand->next();
   if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
   String _sTmpString = _pToken;
   if (!isDigit(_sTmpString[0])) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
   byte _index = _sTmpString.toInt();
   _pToken = g_pSerialCommand->next();
   if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
   _sTmpString = _pToken;
   Configuration::SupportedDevices _eDeviceId = Configuration::convert(_sTmpString);
   if (_eDeviceId == Configuration::E_DEVICE_UNKNOWN) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
   _pToken = g_pSerialCommand->next();
   if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
   _sTmpString = _pToken;
   if (!isDigit(_sTmpString[0])) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
   byte _param1 = _sTmpString.toInt();
   _pToken = g_pSerialCommand->next();
   if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
   _sTmpString = _pToken;
   if (!isDigit(_sTmpString[0])) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
@@ -114,7 +140,7 @@ static void commandSet() {
   _pToken = g_pSerialCommand->next();
 
   if (_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_SET_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_SET_USAGE));
     return;
   }
 
@@ -127,24 +153,23 @@ static void commandSet() {
     if (_pLogic) {
       _pLogic->getParams(_eDeviceId, _param1, _param2, _privateData);
       g_pConfiguration->setDeviceParams(_index, _eDeviceId, _param1, _param2, _privateData);
-      g_pStreamToUse->print(getPgmString(STR_SUCCESS));
+      g_pStreamToUse->println(getPgmString(STR_SUCCESS));
     }
-  } else g_pStreamToUse->print(getPgmString(STR_FAILED));
-  g_pStreamToUse->print('\n');
+  } else g_pStreamToUse->println(getPgmString(STR_FAILED));
 }
 
 static void commandClear() {
   String _sIndex;
   char* _pToken = g_pSerialCommand->next();
   if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_CLEAR_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_CLEAR_USAGE));
     return;
   }
 
   _sIndex = _pToken;
   _pToken = g_pSerialCommand->next();
   if (_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_CLEAR_TOO_MANY_ARGUMENTS));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_CLEAR_TOO_MANY_ARGUMENTS));
     return;
   }
 
@@ -156,10 +181,13 @@ static void commandClear() {
       g_pDeviceContainer->clearLogic(_index);
       g_pConfiguration->setDeviceParams(_index, Configuration::E_DEVICE_UNKNOWN, 0, 0, _privateData);
     }
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_CLEAR) + getPgmString(STR_ALL));
   } else if (isDigit(_sIndex[0])) {
     g_pDeviceContainer->clearLogic(_sIndex.toInt());
     g_pConfiguration->setDeviceParams(_sIndex.toInt(), Configuration::E_DEVICE_UNKNOWN, 0, 0, _privateData);
-  } else g_pStreamToUse->print(getPgmString(STR_COMMAND_CLEAR_NOT_NUMBER_OR_ALL));
+    g_pStreamToUse->print(getPgmString(STR_COMMAND_CLEAR));
+    g_pStreamToUse->println(_sIndex.toInt());
+  } else g_pStreamToUse->println(getPgmString(STR_COMMAND_CLEAR_NOT_NUMBER_OR_ALL));
 }
 
 static void commandSave() {
@@ -181,14 +209,13 @@ static void commandSave() {
   }
 
   g_pStreamToUse->print(getPgmString(STR_COMMAND_SAVE));
-  g_pStreamToUse->print(getPgmString(g_pConfiguration->storeConfiguration() ? STR_YES : STR_NO));
-  g_pStreamToUse->print('\n');
+  g_pStreamToUse->println(getPgmString(g_pConfiguration->storeConfiguration() ? STR_YES : STR_NO));
 }
 
 static void commandAction() {
   char* _pToken = g_pSerialCommand->next();
   if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_ACTION_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_ACTION_USAGE));
     return;
   }
 
@@ -196,7 +223,7 @@ static void commandAction() {
   byte _index = _sTmpString.toInt();
   _pToken = g_pSerialCommand->next();
   if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_ACTION_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_ACTION_USAGE));
     return;
   }
 
@@ -204,7 +231,7 @@ static void commandAction() {
   byte _action = _sTmpString.toInt();
   _pToken = g_pSerialCommand->next();
   if (!_pToken) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_ACTION_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_ACTION_USAGE));
     return;
   }
 
@@ -214,7 +241,7 @@ static void commandAction() {
   // fetch the logic
   ILogic* _pLogic = g_pDeviceContainer->getLogic(_index);
   if (!_pLogic) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_ACTION_INVALID_LOGIC));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_ACTION_INVALID_LOGIC));
     return;
   }
 
@@ -224,8 +251,7 @@ static void commandAction() {
       g_pStreamToUse->print(getPgmString(STR_ACTION));
       g_pStreamToUse->print((char)('0' + _index));
       g_pStreamToUse->print(getPgmString(STR_SEMICOLON_SPACE));
-      _sResponse += '\n';
-      g_pStreamToUse->print(_sResponse);
+      g_pStreamToUse->println(_sResponse);
       break;
 
     case ILogic::E_ACTION_OK:
@@ -244,8 +270,7 @@ static void commandFreeMem() {
     if (_pMem) {
       free(_pMem);
       g_pStreamToUse->print(getPgmString(STR_COMMAND_FREE));
-      g_pStreamToUse->print(_size);
-      g_pStreamToUse->print('\n');
+      g_pStreamToUse->println(_size);
       break;
     }
   }
@@ -254,19 +279,19 @@ static void commandFreeMem() {
 static void commandBt() {
   char* _pToken = NULL;
   if (!(_pToken = g_pSerialCommand->next())) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_BT_USAGE));
     return;
   }
   String _sBaud = _pToken;
 
   if (!(_pToken = g_pSerialCommand->next())) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_BT_USAGE));
     return;
   }
   String _sName = _pToken;
 
   if (!(_pToken = g_pSerialCommand->next())) {
-    g_pStreamToUse->print(getPgmString(STR_COMMAND_BT_USAGE));
+    g_pStreamToUse->println(getPgmString(STR_COMMAND_BT_USAGE));
     return;
   }
   String _sPin = _pToken;
@@ -302,7 +327,7 @@ static void commandBt() {
 }
 
 static void commandUnknown() {
-  g_pStreamToUse->print(getPgmString(STR_COMMAND_UNKNOWN));
+  g_pStreamToUse->println(getPgmString(STR_COMMAND_UNKNOWN));
 }
 
 bool cliCommands_init(Stream& _stream,
@@ -316,17 +341,17 @@ bool cliCommands_init(Stream& _stream,
 
   g_pSerialCommand = new SerialCommand(*g_pStreamToUse);
   g_pSerialCommand->setTerm('\n');
-  g_pSerialCommand->addCommand("?", commandHelp);
-  g_pSerialCommand->addCommand(getPgmString(STR_CMD_LIST).c_str(), commandList);
-  g_pSerialCommand->addCommand(getPgmString(STR_CMD_SET).c_str(), commandSet);
-  g_pSerialCommand->addCommand(getPgmString(STR_CMD_CLEAR).c_str(), commandClear);
-  g_pSerialCommand->addCommand(getPgmString(STR_CMD_SAVE).c_str(), commandSave);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_HELP), commandHelp);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_LIST), commandList);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_SET), commandSet);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_CLEAR), commandClear);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_SAVE), commandSave);
 
-  g_pSerialCommand->addCommand(getPgmString(STR_CMD_ACTION).c_str(), commandAction);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_ACTION), commandAction);
 
-  g_pSerialCommand->addCommand(getPgmString(STR_CMD_BT).c_str(), commandBt);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_BT), commandBt);
 
-  g_pSerialCommand->addCommand(getPgmString(STR_CMD_FREE).c_str(), commandFreeMem);
+  g_pSerialCommand->addCommand(getPgmString(STR_CMD_FREE), commandFreeMem);
   g_pSerialCommand->addDefaultHandler(commandUnknown);
 }
 

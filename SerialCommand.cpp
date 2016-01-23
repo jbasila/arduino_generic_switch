@@ -72,7 +72,7 @@ char *SerialCommand::next()
 // buffer for a prefix command, and calls handlers setup by addCommand() member
 void SerialCommand::readSerial()
 {
-  while(m_pStream->available() > 0)
+  while (m_pStream->available() > 0)
   {
     int i;
     boolean matched;
@@ -112,7 +112,7 @@ void SerialCommand::readSerial()
         }
       }
       if (matched == false) {
-        if(defaultHandler)
+        if (defaultHandler)
           (*defaultHandler)();
         clearBuffer();
       }
@@ -125,6 +125,10 @@ void SerialCommand::readSerial()
       if (bufPos > SERIALCOMMAND_LINE_BUFFER - 1) bufPos = 0; // wrap buffer around if full
     }
   }
+}
+
+void SerialCommand::addCommand(const String& command, void(*function)()) {
+  addCommand(command.c_str(), function);
 }
 
 // Adds a "command" and a handler function to the list of available commands.

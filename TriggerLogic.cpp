@@ -42,13 +42,11 @@ ILogic::LogicAction TriggerLogic::action(const byte _action, const byte _param, 
 
   switch (_action) {
     case 0:
-      // Read switch state
       _sResponse += getPgmString(STR_TRIGGER__ACTIVE_STATE);
       _sResponse += getPgmString(m_active ? STR_YES : STR_NO);
       break;
 
     case 1:
-      // Set edge event
       m_active = _param ? true : false;
       _sResponse += getPgmString(STR_TRIGGER__SET_ACTIVE);
       _sResponse += getPgmString(m_active ? STR_YES : STR_NO);
@@ -67,7 +65,6 @@ ILogic::LogicAction TriggerLogic::action(const byte _action, const byte _param, 
       break;
 
     default:
-      // Read switch state
       _sResponse += getPgmString(STR_INVALID_ACTION);
   }
 

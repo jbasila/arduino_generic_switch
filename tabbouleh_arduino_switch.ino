@@ -77,7 +77,7 @@ void setup() {
   cliCommands_init(*g_pStream, g_cDeviceContainer, g_cConfiguration, *g_pBluetoothConnector);
 
   String _ready = getPgmString(STR_READY);
-  g_pStream->print(_ready);
+  g_pStream->println(_ready);
   Serial.println(_ready);
 }
 
